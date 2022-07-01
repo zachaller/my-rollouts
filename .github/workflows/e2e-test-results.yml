@@ -9,7 +9,7 @@ permissions: {}
 
 jobs:
   test-results:
-    name: E2E Test Results
+    name: "${{ github.event.workflow.name }} Test Results"
     runs-on: ubuntu-latest
     if: github.event.workflow_run.conclusion != 'skipped'
     permissions:
@@ -41,7 +41,7 @@ jobs:
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v1
         with:
-          check_name: "${{ github.event.workflow.name }} Publish Test Results"
+          check_name: "${{ github.event.workflow.name }} Published Test Results"
           commit: ${{ github.event.workflow_run.head_sha }}
           event_file: artifacts/Event File/event.json
           event_name: ${{ github.event.workflow_run.event }}
