@@ -422,6 +422,10 @@ func (c *Controller) writeBackToInformer(ro *v1alpha1.Rollout) {
 	err = c.rolloutsInformer.GetStore().Update(&un)
 	if err != nil {
 		logCtx.Errorf("failed to update informer store: %v", err)
+		if k8serrors.IsConflict(err) {
+			logCtx.Error("Conflict error, will retry")
+			c.enqueueRolloutAfter(ro, time.Second)
+		}
 		return
 	}
 	logCtx.Info("persisted to informer")

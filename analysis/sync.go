@@ -2,6 +2,9 @@ package analysis
 
 import (
 	"context"
+	"time"
+
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	patchtypes "k8s.io/apimachinery/pkg/types"
@@ -30,9 +33,13 @@ func (c *Controller) persistAnalysisRunStatus(orig *v1alpha1.AnalysisRun, newSta
 		return nil
 	}
 	logCtx.Debugf("AnalysisRun Patch: %s", patch)
-	_, err = c.argoProjClientset.ArgoprojV1alpha1().AnalysisRuns(orig.Namespace).Patch(ctx, orig.Name, patchtypes.MergePatchType, patch, metav1.PatchOptions{})
+	ar, err := c.argoProjClientset.ArgoprojV1alpha1().AnalysisRuns(orig.Namespace).Patch(ctx, orig.Name, patchtypes.MergePatchType, patch, metav1.PatchOptions{})
 	if err != nil {
 		logCtx.Warningf("Error updating analysisRun: %v", err)
+		if k8serrors.IsConflict(err) {
+			logCtx.Error("Conflict error, will retry")
+			c.enqueueAnalysisAfter(ar, time.Second)
+		}
 		return err
 	}
 	logCtx.Info("Patch status successfully")
