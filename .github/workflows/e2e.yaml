@@ -67,9 +67,9 @@ jobs:
       - name: Run e2e tests
         run: make test-e2e
         if: ${{ !(github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled) }}
-      - name: Output Rerun Overview
-        run: |
-          [[ -f rerunreport.txt ]] && cat rerunreport.txt
+      #- name: Output Rerun Overview
+      #  run: |
+      #    [[ -f rerunreport.txt ]] && cat rerunreport.txt
       - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@v2
