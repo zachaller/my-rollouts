@@ -70,11 +70,11 @@ jobs:
       - name: Output Rerun Overview
         run: |
           [[ -f rerunreport.txt ]] && cat rerunreport.txt || echo "No rerun report found"
-      - name: Upload Test Results
+      - name: Upload E2E Test Results
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: Unit Test Results
+          name: E2E Test Results
           path: |
             junit.xml
       - name: Upload e2e-controller logs
