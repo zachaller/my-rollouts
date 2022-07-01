@@ -325,9 +325,13 @@ func (ec *Controller) persistExperimentStatus(orig *v1alpha1.Experiment, newStat
 		return nil
 	}
 	logCtx.Debugf("Experiment Patch: %s", patch)
-	_, err = ec.argoProjClientset.ArgoprojV1alpha1().Experiments(orig.Namespace).Patch(ctx, orig.Name, patchtypes.MergePatchType, patch, metav1.PatchOptions{})
+	ex, err := ec.argoProjClientset.ArgoprojV1alpha1().Experiments(orig.Namespace).Patch(ctx, orig.Name, patchtypes.MergePatchType, patch, metav1.PatchOptions{})
 	if err != nil {
 		logCtx.Warningf("Error updating experiment: %v", err)
+		if k8serrors.IsConflict(err) {
+			logCtx.Error("Conflict error, will retry")
+			ec.enqueueExperimentAfter(ex, time.Second)
+		}
 		return err
 	}
 	logCtx.Info("Patch status successfully")
