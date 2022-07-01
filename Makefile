@@ -219,6 +219,11 @@ start-e2e:
 test-e2e: install-devtools-local
 	${DIST_DIR}/gotestsum --rerun-fails-report=rerunreport.txt --junitfile=junit.xml --format=testname --packages="./test/e2e" --rerun-fails=5 -- -timeout 60m -count 1 --tags e2e -p ${E2E_PARALLEL} -v --short ./test/e2e ${E2E_TEST_OPTIONS}
 
+.PHONY: test-unit
+ test-unit: install-devtools-local
+	${DIST_DIR}/gotestsum --rerun-fails-report=rerunreport.txt --junitfile=junit.xml --format=testname --packages="./..." -- -covermode=count -coverprofile=coverage.out ./...
+
+
 .PHONY: coverage
 coverage: test
 	go tool cover -html=coverage.out -o coverage.html
