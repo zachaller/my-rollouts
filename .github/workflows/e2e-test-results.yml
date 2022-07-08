@@ -14,9 +14,7 @@ jobs:
     if: github.event.workflow_run.conclusion != 'skipped'
     permissions:
       checks: write
-      # needed unless run with comment_mode: off
       pull-requests: write
-      # required by download step to access artifacts API
       actions: read
     steps:
       - name: Download and Extract Artifacts
@@ -42,3 +40,4 @@ jobs:
           files: "artifacts/**/*.xml"
           compare_to_earlier_commit: false
           test_changes_limit: 0
+          fail_on: "errors"
